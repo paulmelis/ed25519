@@ -73,6 +73,15 @@ byte buffer, `private_key` must be a writable 64 byte buffer and `seed` must be
 a 32 byte buffer.
 
 ```c
+void ed25519_get_pubkey(unsigned char *public_key, const unsigned char *private_key);
+```
+
+Derives public key from the given private key. `public_key` must be 
+a writable 32 byte buffer, `private_key` must be a 64 byte buffer with 
+a valid private key.
+
+
+```c
 void ed25519_sign(unsigned char *signature,
                   const unsigned char *message, size_t message_len,
                   const unsigned char *public_key, const unsigned char *private_key);
@@ -164,3 +173,36 @@ ed25519_key_exchange(shared_secret, other_public_key, private_key);
 License
 -------
 All code is released under the zlib license. See license.txt for details.
+
+
+Compatibility with other Ed25519 implementations
+------------------------------------------------
+
+From https://github.com/orlp/ed25519/issues/1
+
+> There are different ways to store a Ed25519 private key. The seed gets hashed to get the private key, and then the private key gets multiplied by the Ed25519 curve basepoint to get the public key. You can store the seed and hash it everytime you need the private key, or just store the result of the hash. My library does the latter, as this saves a bit of performance on every operation. This means that it's impossible to get the seed back from the private or public key.
+> 
+> Also interesting is that Ed25519 also requires the public key while signing. Some libraries hide this by concatenating the public key and the private key/seed and calling that result the private key. I don't, and require you to pass both the public key and private key to the sign operation.
+> 
+> It's impossible to get the seed from the private key. To turn a private key (which is the hashed seed) into a public key, look into `ed25519_create_keypair` and remove the hashing code.
+
+From https://github.com/orlp/ed25519/issues/10
+
+> `ed25519_sign` is not significantly different from SUPERCOP's ref10, I simply have a different representation of the private key.
+>
+> ref10 stores the private key by storing the seed (32 bytes) and public key (32 bytes) as the 'private key'.
+>
+> I instead straight up store the hashed seed (64 bytes) as the private key to not have to re-hash the seed on every sign operation.
+>
+> So if you simply use the 64 bytes from the ref10 'private key' as the private key in this library you will end up with incorrect results.
+>
+> If you wish to convert a ref10 private key to a private key for this library you can use:
+
+```
+void ref10_to_lib(unsigned char *private_key, const unsigned char *ref10_private_key) {
+    sha512(ref10_private_key, 32, private_key);
+    private_key[0] &= 248;
+    private_key[31] &= 63;
+    private_key[31] |= 64;
+}
+```

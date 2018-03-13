@@ -6,9 +6,6 @@
 /* #define ED25519_DLL */
 #include "src/ed25519.h"
 
-#include "src/ge.h"
-#include "src/sc.h"
-
 
 int main() {
     unsigned char public_key[32], private_key[64], seed[32], scalar[32];
