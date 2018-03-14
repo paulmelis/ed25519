@@ -22,3 +22,10 @@ void ed25519_get_pubkey(unsigned char *public_key, const unsigned char *private_
     ge_scalarmult_base(&A, private_key);
     ge_p3_tobytes(public_key, &A);
 }
+
+void ed25519_privkey_from_ref10(unsigned char *private_key, const unsigned char *ref10_private_key) {
+    sha512(ref10_private_key, 32, private_key);
+    private_key[0] &= 248;
+    private_key[31] &= 63;
+    private_key[31] |= 64;
+}

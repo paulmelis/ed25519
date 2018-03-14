@@ -7,8 +7,6 @@ import ed25519
 # examples of inputs: see sign.input
 # should produce no output: python sign.py < sign.input
 
-# warning: currently 37 seconds/line on a fast machine
-
 # fields on each input line: sk, pk, m, sm
 # each field hex
 # each field colon-terminated
@@ -21,37 +19,35 @@ with open('sign.input', 'rt') as f:
         
         x = line.split(':')
         
-        sk = binascii.unhexlify(x[0])
-        print(len(sk))
-        #pk = ed25519.get_pubkey(sk)
-        pk = binascii.unhexlify(x[1])
+        sk_ref10 = binascii.unhexlify(x[0])
+        sk = ed25519.privkey_from_ref10(sk_ref10)
+        
+        pk = ed25519.get_pubkey(sk)
+        
+        #assert x[0] == (sk_ref10 + pk).hex()       # XXX
+        assert x[1] == pk.hex()
         
         m = binascii.unhexlify(x[2])
         
-        #print(m, len(pk), len(sk))
-        
         s = ed25519.sign(m, pk, sk)
+        assert ed25519.verify(s, m, pk)
         
-        if not ed25519.verify(s, m, pk):
-            
+        if x[3] == binascii.hexlify(s + m):
+
             sys.stdout.write('!')
         
-        else:
+        """else:
             if len(m) == 0:
-                forgedm = "x"
+                forgedm = b'x'
             else:
                 forgedmlen = len(m)
-                forgedm = ''.join([chr(ord(m[i])+(i==forgedmlen-1)) for i in range(forgedmlen)])
+                forgedm = bytes([m[i]+(i==forgedmlen-1) for i in range(forgedmlen)])
             
             forgedsuccess = ed25519.verify(s, forgedm, pk)
             assert not forgedsuccess
             
-            assert x[0] == (sk + pk).hex()
-            assert x[1] == pk.hex()
-            assert x[3] == (s + m).hex()
-            
             sys.stdout.write('.')
-            
+        """
         sys.stdout.flush()
 
 sys.stdout.write('\n')
