@@ -1,0 +1,16 @@
+https://ed25519.cr.yp.to/software.html
+
+Original Ed25519 page, including reference implementation
+in pure python
+
+
+https://github.com/orlp/ed25519
+
+Implementation this distribution is based on
+
+
+
+https://blog.mozilla.org/warner/2011/11/29/ed25519-keys/
+
+Very nice overview of the different ways keys are stored
+by some of the Ed25519 libraries out there

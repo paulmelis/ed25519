@@ -24,7 +24,9 @@ extern "C" {
 int ED25519_DECLSPEC ed25519_create_seed(unsigned char *seed);
 #endif
 
+// Create a public,private key pair from a seed
 void ED25519_DECLSPEC ed25519_create_keypair(unsigned char *public_key, unsigned char *private_key, const unsigned char *seed);
+// Derive the public key from a private key
 void ED25519_DECLSPEC ed25519_get_pubkey(unsigned char *public_key, const unsigned char *private_key);
 // ref10 stores the private key by storing the seed (32 bytes) and public key (32 bytes) as the 'private key'
 void ED25519_DECLSPEC ed25519_privkey_from_ref10(unsigned char *private_key, const unsigned char *ref10_private_key);
