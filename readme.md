@@ -1,6 +1,8 @@
 Ed25519
 =======
 
+Note: this is a fork of https://github.com/orlp/ed25519.
+
 This is a portable implementation of [Ed25519](http://ed25519.cr.yp.to/) based
 on the SUPERCOP "ref10" implementation. Additionally there is key exchanging
 and scalar addition included to further aid building a PKI using Ed25519. All

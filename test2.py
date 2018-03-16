@@ -4,50 +4,54 @@ import sys
 import binascii
 import ed25519
 
-# examples of inputs: see sign.input
-# should produce no output: python sign.py < sign.input
-
-# fields on each input line: sk, pk, m, sm
-# each field hex
-# each field colon-terminated
-# sk includes pk at end
-# sm includes m at end
-
 with open('sign.input', 'rt') as f:
+
+    # fields on each input line: sk+pk, pk, m, sm+m
+    # each field hex
+    # each field colon-terminated
+    
+    # binascii.unhexlify(): hex string -> binary (bytes object)
 
     for line in f.readlines():
         
         x = line.split(':')
+        
+        seed_ref10 = binascii.unhexlify(x[0][:64])
+        #public_key_ref10 = binascii.unhexlify(x[0][64:])
         
         sk_ref10 = binascii.unhexlify(x[0])
         sk = ed25519.privkey_from_ref10(sk_ref10)
         
         pk = ed25519.get_pubkey(sk)
         
-        #assert x[0] == (sk_ref10 + pk).hex()       # XXX
         assert x[1] == pk.hex()
+        assert x[0] == (seed_ref10 + pk).hex()
         
         m = binascii.unhexlify(x[2])
         
         s = ed25519.sign(m, pk, sk)
         assert ed25519.verify(s, m, pk)
         
-        if x[3] == binascii.hexlify(s + m):
-
-            sys.stdout.write('!')
+        if x[3] != (s + m).hex():
+            sys.stdout.write('\n')
+            sys.stdout.write('! ')
+            sys.stdout.write(line)
+            sys.stdout.write('\n')
         
-        """else:
-            if len(m) == 0:
-                forgedm = b'x'
-            else:
-                forgedmlen = len(m)
-                forgedm = bytes([m[i]+(i==forgedmlen-1) for i in range(forgedmlen)])
-            
-            forgedsuccess = ed25519.verify(s, forgedm, pk)
-            assert not forgedsuccess
-            
-            sys.stdout.write('.')
         """
+        # This part is broken in the original code
+        if len(m) == 0:
+            forgedm = b'x'
+        else:
+            forgedmlen = len(m)
+            print(m.hex())
+            forgedm = bytes([m[i]+(i==forgedmlen-1) for i in range(forgedmlen)])
+        
+        forgedsuccess = ed25519.verify(s, forgedm, pk)
+        assert not forgedsuccess
+        """
+        
+        sys.stdout.write('.')
         sys.stdout.flush()
 
 sys.stdout.write('\n')
