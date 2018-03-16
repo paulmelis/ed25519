@@ -23,6 +23,4 @@ int hash_final(void *context, unsigned char *out);
 // Compute the hash for the given message
 int hash(const unsigned char *message, size_t message_len, unsigned char *out);
 
-extern int use_python_hash;
-
 #endif

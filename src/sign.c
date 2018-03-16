@@ -11,24 +11,24 @@ void ed25519_sign(unsigned char *signature, const unsigned char *message, size_t
     ge_p3 R;
 
     hash_context = hash_create_context();
-    
     hash_init(hash_context);
     hash_update(hash_context, private_key + 32, 32);
     hash_update(hash_context, message, message_len);
     hash_final(hash_context, r);
+    hash_free_context(hash_context);
 
     sc_reduce(r);
     ge_scalarmult_base(&R, r);
     ge_p3_tobytes(signature, &R);
 
+    hash_context = hash_create_context();
     hash_init(hash_context);
     hash_update(hash_context, signature, 32);
     hash_update(hash_context, public_key, 32);
     hash_update(hash_context, message, message_len);
     hash_final(hash_context, hram);
-
+    hash_free_context(hash_context);
+    
     sc_reduce(hram);
     sc_muladd(signature + 32, hram, private_key, r);
-    
-    hash_free_context(hash_context);
 }

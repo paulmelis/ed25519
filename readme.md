@@ -1,7 +1,13 @@
 Ed25519
 =======
 
-Note: this is a fork of https://github.com/orlp/ed25519.
+Note: this is a fork of the Ed25519 implementation by Orson Peters 
+<orsonpeters@gmail.com>, available at https://github.com/orlp/ed25519.
+
+This fork, by Paul Melis <paulmelis@gmail.com>, has additional features,
+see below.
+
+Original description:
 
 This is a portable implementation of [Ed25519](http://ed25519.cr.yp.to/) based
 on the SUPERCOP "ref10" implementation. Additionally there is key exchanging
@@ -14,6 +20,22 @@ Windows, `/dev/urandom` on nix). If you wish to be entirely portable define
 `ED25519_NO_SEED`. This disables the `ed25519_create_seed` function, so if your
 application requires key generation you must supply your own seeding function
 (which is simply a 256 bit (32 byte) cryptographic random number generator).
+
+Additional features
+-------------------
+
+Compared to the original code at https://github.com/orlp/ed25519 this
+Ed25519 implementation contains a Python module (`ed25519`) that wraps the
+C routines for creating key pairs, signing and verifying messages. 
+
+The `ed25519` Python module also has an additional option to use a custom 
+hash function in place of the default SHA-512. See `ed25519.custom_hash_function()`.
+
+There's also two extra utility routines `ed25519_privkey_from_ref10` and `ed25519_get_pubkey`,
+including Python wrappers. See the description of the C API below.
+
+Currently, C routines `ed25519_add_scalar` and `ed25519_key_exchange` are
+not available from Python, but this would not be much work to add.
 
 
 Performance
@@ -127,7 +149,7 @@ shared secret. It is recommended to hash the shared secret before using it.
 `shared_secret` must be a 32 byte writable buffer where the shared secret will
 be stored.
 
-Example
+Examples
 -------
 
 ```c
@@ -172,9 +194,36 @@ ed25519_key_exchange(shared_secret, other_public_key, private_key);
 
 ```
 
+```python
+#!/usr/bin/env python
+import ed25519
+
+message = b'Hello world!'
+seed = b'abcdefghijklmnopqrstuvwxyz789012'
+
+pubkey, privkey = ed25519.create_keypair(seed)
+
+derived_pubkey = ed25519.get_pubkey(privkey)
+assert derived_pubkey == pubkey
+
+signature = ed25519.sign(message, pubkey, privkey)
+assert len(signature) == 64
+
+res = ed25519.verify(signature, message, pubkey)
+assert res
+
+signature = bytes([255 - signature[0]]) + signature[1:]
+res = ed25519.verify(signature, message, pubkey)
+assert not res
+```
+
+
 License
 -------
+
 All code is released under the zlib license. See license.txt for details.
+
+The additional code by Paul Melis is covered by the same license.
 
 
 Compatibility with other Ed25519 implementations

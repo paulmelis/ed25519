@@ -1,5 +1,6 @@
 #include <Python.h>
 #include "ed25519.h"
+#include "pyapi.h"
 
 /*
 There are no defined types for seeds, private keys, public keys, shared secrets or signatures. Instead simple unsigned char buffers are used with the following sizes:
@@ -12,43 +13,23 @@ unsigned char scalar[32];
 unsigned char shared_secret[32];
 */
 
+int use_python_hash = 0;
+
+// User-implemented methods
+PyObject* py_hash_create_context = NULL;
+PyObject* py_hash_init = NULL;
+PyObject* py_hash_update = NULL;
+PyObject* py_hash_final = NULL;
+PyObject* py_hash = NULL;
+
+//
+// API methods
+//
+
 static char create_keypair_doc[] = 
 "create_keypair(seed) -> (public_key, private_key)\n\
 \n\
 Creates a new key pair from the given seed\n\
-";
-
-static char get_pubkey_doc[] = 
-"get_pubkey(private_key) -> public_key\n\
-\n\
-Derives the public key for the given private key, which\n\
-must be a bytes object of length 64 holding a valid\n\
-private key.\n\
-";
-   
-static char sign_doc[] =    
-"sign(message, public_key, private_key) -> signature\n\
-\n\
-Creates a signature for a message using the given key pair.\n\
-";
-
-static char verify_doc[] =    
-"verify(signature, message, public_key) -> bool\n\
-\n\
-Verifies the signature on a message using the given public key.\n\
-\n\
-Returns True if the signature matches, False otherwise.\n\
-";
-  
-static char privkey_from_ref10_doc[] =    
-"privkey_from_ref10(ref10_private_key) -> private_key\n\
-\n\
-SUPERCOP's ref10 implementation stores the \"private key\"\n\
-as the 64-byte concatenation of the seed and public key (32 + 32).\n\
-\n\
-This library stores a private key as the hash of the seed (plus some\n\
-additional bit fiddling). Derive such a private key from a ref10\n\
-private key.\n\
 ";
 
 static PyObject*
@@ -75,6 +56,14 @@ py_create_keypair(PyObject* self, PyObject* args, PyObject *kwds)
     return Py_BuildValue("y#y#", pubkey, 32, privkey, 64);
 }
 
+static char get_pubkey_doc[] = 
+"get_pubkey(private_key) -> public_key\n\
+\n\
+Derives the public key for the given private key, which\n\
+must be a bytes object of length 64 holding a valid\n\
+private key.\n\
+";
+
 static PyObject*
 py_get_pubkey(PyObject* self, PyObject* args, PyObject *kwds)
 {
@@ -98,6 +87,17 @@ py_get_pubkey(PyObject* self, PyObject* args, PyObject *kwds)
     return Py_BuildValue("y#", pubkey, 32);
 }
 
+static char privkey_from_ref10_doc[] =    
+"privkey_from_ref10(ref10_private_key) -> private_key\n\
+\n\
+SUPERCOP's ref10 implementation stores the \"private key\"\n\
+as the 64-byte concatenation of the seed and public key (32 + 32).\n\
+\n\
+This library stores a private key as the hash of the seed (plus some\n\
+additional bit fiddling). Derive such a private key from a ref10\n\
+private key.\n\
+";
+
 static PyObject*
 py_privkey_from_ref10(PyObject* self, PyObject* args, PyObject *kwds)
 {
@@ -120,6 +120,12 @@ py_privkey_from_ref10(PyObject* self, PyObject* args, PyObject *kwds)
     
     return Py_BuildValue("y#", privkey, 64);
 }
+
+static char sign_doc[] =    
+"sign(message, public_key, private_key) -> signature\n\
+\n\
+Creates a signature for a message using the given key pair.\n\
+";
 
 static PyObject*
 py_sign(PyObject* self, PyObject* args, PyObject *kwds)
@@ -150,6 +156,14 @@ py_sign(PyObject* self, PyObject* args, PyObject *kwds)
     return Py_BuildValue("y#", signature, 64);
 }
 
+static char verify_doc[] =    
+"verify(signature, message, public_key) -> bool\n\
+\n\
+Verifies the signature on a message using the given public key.\n\
+\n\
+Returns True if the signature matches, False otherwise.\n\
+";
+  
 static PyObject*
 py_verify(PyObject* self, PyObject* args, PyObject *kwds)
 {
@@ -179,14 +193,84 @@ py_verify(PyObject* self, PyObject* args, PyObject *kwds)
     return PyBool_FromLong(res);
 }
 
+static char custom_hash_function_doc[] = 
+"custom_hash_function(create_context, init, update, final, hash)\n\
+\n\
+Define a custom hash function to use. All arguments should be Python\n\
+functions, with the following signatures and return values:\n\
+\n\
+    create_context() -> object\n\
+\n\
+        Create a new context for the hash, e.g the value of\n\
+        hashlib.sha512(). The object returned by this function\n\
+        will be passed as the \"context\" argument below.\n\
+\n\
+    init(context)\n\
+\n\
+        Initialize the context. This might be a no-op for\n\
+        certain hash implementations, as create_context() might\n\
+        already take care of initialization.\n\
+\n\
+        init() is never called more than once for a context.\n\
+\n\
+    update(context, arg)\n\
+\n\
+        Update the hash with the given argument, which\n\
+        will be a bytes object.\n\
+\n\
+    final(context)  -> hash\n\
+\n\
+        Compute the final hash (digest) and return it\n\
+        as a bytes object, which must have length 64.\n\
+\n\
+    hash(message) -> hash\n\
+\n\
+        Compute the 64-byte hash for a message.\n\
+        The message is passed as a bytes object.\n\
+\n\
+";
+
+static PyObject*
+py_custom_hash_function(PyObject* self, PyObject* args, PyObject *kwds)
+{
+    if (!PyArg_ParseTuple(args, "OOOOO", &py_hash_create_context, &py_hash_init, &py_hash_update, &py_hash_final, &py_hash))
+        return NULL;
+    
+    use_python_hash = 1;
+    
+    Py_RETURN_NONE;
+}
+
+// Error handling 
+
+void
+print_python_error(void)
+{
+    printf("=== Python ERROR ===\n");
+
+    if (PyErr_Occurred() == NULL)
+    {
+        printf("print_python_error(): error indicator not set!?\n");
+        return;
+    }
+
+    PyErr_Print();
+
+    printf("====================\n");
+}
+
+// 
+// Module
+//
+
 static PyMethodDef ModuleMethods[] =
 {    
-    // {"readply", (PyCFunction)readply, METH_VARARGS|METH_KEYWORDS, readply_func_doc},
-    {"create_keypair",  (PyCFunction)py_create_keypair, METH_VARARGS|METH_KEYWORDS, create_keypair_doc},
-    {"get_pubkey",      (PyCFunction)py_get_pubkey,     METH_VARARGS|METH_KEYWORDS, get_pubkey_doc},
-    {"privkey_from_ref10", (PyCFunction)py_privkey_from_ref10,     METH_VARARGS|METH_KEYWORDS, privkey_from_ref10_doc},
-    {"sign",            (PyCFunction)py_sign,           METH_VARARGS|METH_KEYWORDS, sign_doc},
-    {"verify",          (PyCFunction)py_verify,         METH_VARARGS|METH_KEYWORDS, verify_doc},
+    {"create_keypair",          (PyCFunction)py_create_keypair,         METH_VARARGS|METH_KEYWORDS, create_keypair_doc},
+    {"get_pubkey",              (PyCFunction)py_get_pubkey,             METH_VARARGS|METH_KEYWORDS, get_pubkey_doc},
+    {"privkey_from_ref10",      (PyCFunction)py_privkey_from_ref10,     METH_VARARGS|METH_KEYWORDS, privkey_from_ref10_doc},
+    {"sign",                    (PyCFunction)py_sign,                   METH_VARARGS|METH_KEYWORDS, sign_doc},
+    {"verify",                  (PyCFunction)py_verify,                 METH_VARARGS|METH_KEYWORDS, verify_doc},
+    {"custom_hash_function",    (PyCFunction)py_custom_hash_function,   METH_VARARGS|METH_KEYWORDS, custom_hash_function_doc},
     //add_scalar
     //key_exchange
     //create_seed
