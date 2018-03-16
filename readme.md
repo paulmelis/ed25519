@@ -2,7 +2,9 @@ Ed25519
 =======
 
 Note: this is a fork of the Ed25519 implementation available at 
-https://github.com/orlp/ed25519. That original implementation is 
+https://github.com/orlp/ed25519. 
+
+That original implementation is 
 by Orson Peters <orsonpeters@gmail.com>.
 
 This fork, by Paul Melis <paulmelis@gmail.com>, has additional features,
@@ -27,7 +29,7 @@ Additional features
 -------------------
 
 Compared to the original code at https://github.com/orlp/ed25519 this
-Ed25519 implementation contains a Python module (`ed25519`) that wraps the
+Ed25519 implementation contains a Python 3 module (`ed25519`) that wraps the
 C routines for creating key pairs, signing and verifying messages. 
 
 The `ed25519` Python module also has an additional option to use a custom 
@@ -36,8 +38,11 @@ hash function in place of the default SHA-512. See `ed25519.custom_hash_function
 There's also two extra utility routines `ed25519_privkey_from_ref10` and `ed25519_get_pubkey`,
 including Python wrappers. See the description of the C API below.
 
-Note: currently, C routines `ed25519_add_scalar` and `ed25519_key_exchange` are
+Limitations:
+
+- Currently, C routines `ed25519_add_scalar` and `ed25519_key_exchange` are
 not available from Python, but this would not be much work to add.
+- The Python module is only compatible with Python 3.x
 
 
 Performance

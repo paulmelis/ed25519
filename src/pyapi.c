@@ -301,6 +301,13 @@ the seed and not as a concatenation of the seed and the public key\n\
 for more information.\n\
 ");
 
+#if PY_MAJOR_VERSION == 2
+PyMODINIT_FUNC
+inited25519(void)
+{
+    (void) Py_InitModule("ed25519", ModuleMethods);
+}
+#elif PY_MAJOR_VERSION == 3
 static struct PyModuleDef module =
 {
    PyModuleDef_HEAD_INIT,
@@ -320,6 +327,6 @@ PyInit_ed25519(void)
     if (m == NULL)
         return NULL;
 
-    //PyModule_AddObject(m, "error", SpamError);
     return m;
 }
+#endif
