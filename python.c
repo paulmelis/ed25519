@@ -43,12 +43,13 @@ Returns True if the signature matches, False otherwise.\n\
 static char privkey_from_ref10_doc[] =    
 "privkey_from_ref10(ref10_private_key) -> private_key\n\
 \n\
-SUPERCOP's ref10 implementation stores the private key\n\
+SUPERCOP's ref10 implementation stores the \"private key\"\n\
 as the 64-byte concatenation of the seed and public key (32 + 32).\n\
-This library stores a private key as the hash of the seed.\n\
-Derive such a private key from a ref10 private key.\n\
+\n\
+This library stores a private key as the hash of the seed (plus some\n\
+additional bit fiddling). Derive such a private key from a ref10\n\
+private key.\n\
 ";
-
 
 static PyObject*
 py_create_keypair(PyObject* self, PyObject* args, PyObject *kwds)
