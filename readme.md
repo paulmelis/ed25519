@@ -1,13 +1,15 @@
 Ed25519
 =======
 
-Note: this is a fork of the Ed25519 implementation by Orson Peters 
-<orsonpeters@gmail.com>, available at https://github.com/orlp/ed25519.
+Note: this is a fork of the Ed25519 implementation available at 
+https://github.com/orlp/ed25519. That original implementation is 
+by Orson Peters <orsonpeters@gmail.com>.
 
 This fork, by Paul Melis <paulmelis@gmail.com>, has additional features,
 see below.
 
-Original description:
+Original description
+--------------------
 
 This is a portable implementation of [Ed25519](http://ed25519.cr.yp.to/) based
 on the SUPERCOP "ref10" implementation. Additionally there is key exchanging
@@ -34,7 +36,7 @@ hash function in place of the default SHA-512. See `ed25519.custom_hash_function
 There's also two extra utility routines `ed25519_privkey_from_ref10` and `ed25519_get_pubkey`,
 including Python wrappers. See the description of the C API below.
 
-Currently, C routines `ed25519_add_scalar` and `ed25519_key_exchange` are
+Note: currently, C routines `ed25519_add_scalar` and `ed25519_key_exchange` are
 not available from Python, but this would not be much work to add.
 
 
