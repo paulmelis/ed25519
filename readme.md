@@ -49,24 +49,24 @@ Performance
 
 On a Linux machine with an Intel(R) Core(TM) i5-4460 CPU @ 3.20GHz:
 
-    | Call | Performance |
-    | ---- | ----------- |
-    | ed25519_create_seed | 50113.256 per second |
-    | ed25519_create_keypair | 23481.813 per second |
-    | ed25519_sign (short message) | 23064.912 per second |
-    | ed25519_verify (short message) | 9011.514 per second |
-    | ed25519_add_scalar | 23382.679 per second |
-    | ed25519_key_exchange | 9151.911 per second |
+| Call | Performance |
+| ---- | ----------- |
+| ed25519_create_seed | 50113.256 per second |
+| ed25519_create_keypair | 23481.813 per second |
+| ed25519_sign (short message) | 23064.912 per second |
+| ed25519_verify (short message) | 9011.514 per second |
+| ed25519_add_scalar | 23382.679 per second |
+| ed25519_key_exchange | 9151.911 per second |
 
 When used from Python the speeds are only slightly lower:
 
-    | Call | Performance |
-    | ---- | ----------- |
-    | create_seed | 49252.795 per second |
-    | create_keypair | 22812.513 per second |
-    | sign | 22501.740 per second |
-    | verify | 8674.004 per second |
-    | key_exchange | 9058.414 per second |
+| Call | Performance |
+| ---- | ----------- |
+| create_seed | 49252.795 per second |
+| create_keypair | 22812.513 per second |
+| sign | 22501.740 per second |
+| verify | 8674.004 per second |
+| key_exchange | 9058.414 per second |
 
 The speeds on other machines will vary, of course. 
 Sign/verify times will be higher with longer messages. 
