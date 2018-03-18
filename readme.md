@@ -7,7 +7,7 @@ https://github.com/orlp/ed25519.
 That original implementation is 
 by Orson Peters <orsonpeters@gmail.com>.
 
-This fork, by Paul Melis <paulmelis@gmail.com>, has additional features,
+This fork, by Paul Melis <paul.melis@gmail.com>, has additional features,
 see below.
 
 Original description
