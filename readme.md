@@ -47,18 +47,31 @@ Limitations:
 Performance
 -----------
 
-On a Windows machine with an Intel Pentium B970 @ 2.3GHz I got the following
-speeds (running on only one a single core):
+On a Linux machine with an Intel(R) Core(TM) i5-4460 CPU @ 3.20GHz:
 
-    Seed generation: 64us (15625 per second)
-    Key generation: 88us (11364 per second)
-    Message signing (short message): 87us (11494 per second)
-    Message verifying (short message): 228us (4386 per second)
-    Scalar addition: 100us (10000 per second)
-    Key exchange: 220us (4545 per second)
+    | Call | Performance |
+    | ---- | ----------- |
+    | ed25519_create_seed | 50113.256 per second |
+    | ed25519_create_keypair | 23481.813 per second |
+    | ed25519_sign (short message) | 23064.912 per second |
+    | ed25519_verify (short message) | 9011.514 per second |
+    | ed25519_add_scalar | 23382.679 per second |
+    | ed25519_key_exchange | 9151.911 per second |
 
-The speeds on other machines may vary. Sign/verify times will be higher with
-longer messages. The implementation significantly benefits from 64 bit
+When used from Python the speeds are only slightly lower:
+
+    | Call | Performance |
+    | ---- | ----------- |
+    | create_seed | 49252.795 per second |
+    | create_keypair | 22812.513 per second |
+    | sign | 22501.740 per second |
+    | verify | 8674.004 per second |
+    | key_exchange | 9058.414 per second |
+
+The speeds on other machines will vary, of course. 
+Sign/verify times will be higher with longer messages. 
+
+The implementation significantly benefits from 64 bit
 architectures, if possible compile as 64 bit.
 
 

@@ -79,7 +79,6 @@ int main() {
     
     const int N = 20000;
     
-    printf("testing seed generation performance: ");
     gettimeofday(&start, NULL);
     for (i = 0; i < N; ++i) {
         ed25519_create_seed(seed);
@@ -88,7 +87,6 @@ int main() {
     tdiff = end.tv_sec - start.tv_sec + (end.tv_usec - start.tv_usec) / 1000000.0;
     printf("ed25519_create_seed: %.3f per second\n", N/tdiff);
 
-    printf("testing key generation performance: ");
     gettimeofday(&start, NULL);
     for (i = 0; i < N; ++i) {
         ed25519_create_keypair(public_key, private_key, seed);
@@ -97,7 +95,6 @@ int main() {
     tdiff = end.tv_sec - start.tv_sec + (end.tv_usec - start.tv_usec) / 1000000.0;
     printf("ed25519_create_keypair: %.3f per second\n", N/tdiff);
     
-    printf("testing sign performance: ");
     gettimeofday(&start, NULL);
     for (i = 0; i < N; ++i) {
         ed25519_sign(signature, message, message_len, public_key, private_key);
@@ -106,7 +103,6 @@ int main() {
     tdiff = end.tv_sec - start.tv_sec + (end.tv_usec - start.tv_usec) / 1000000.0;
     printf("ed25519_sign: %.3f per second\n", N/tdiff);
 
-    printf("testing verify performance: ");
     gettimeofday(&start, NULL);
     for (i = 0; i < N; ++i) {
         ed25519_verify(signature, message, message_len, public_key);
@@ -115,7 +111,6 @@ int main() {
     tdiff = end.tv_sec - start.tv_sec + (end.tv_usec - start.tv_usec) / 1000000.0;
     printf("ed25519_verify: %.3f per second\n", N/tdiff);
     
-    printf("testing keypair scalar addition performance: ");
     gettimeofday(&start, NULL);
     for (i = 0; i < N; ++i) {
         ed25519_add_scalar(public_key, private_key, scalar);
@@ -124,7 +119,6 @@ int main() {
     tdiff = end.tv_sec - start.tv_sec + (end.tv_usec - start.tv_usec) / 1000000.0;
     printf("ed25519_add_scalar: %.3f per second\n", N/tdiff);
 
-    printf("testing public key scalar addition performance: ");
     gettimeofday(&start, NULL);
     for (i = 0; i < N; ++i) {
         ed25519_add_scalar(public_key, NULL, scalar);
@@ -133,7 +127,6 @@ int main() {
     tdiff = end.tv_sec - start.tv_sec + (end.tv_usec - start.tv_usec) / 1000000.0;
     printf("ed25519_add_scalar: %.3f per second\n", N/tdiff);
 
-    printf("testing key exchange performance: ");
     gettimeofday(&start, NULL);
     for (i = 0; i < N; ++i) {
         ed25519_key_exchange(shared_secret, other_public_key, private_key);
