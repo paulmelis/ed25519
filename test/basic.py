@@ -2,7 +2,8 @@
 import ed25519
 
 message = b'Hello world!'
-seed = b'abcdefghijklmnopqrstuvwxyz789012'
+
+seed = ed25519.create_seed()
 
 pubkey, privkey = ed25519.create_keypair(seed)
 
