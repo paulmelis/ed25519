@@ -11,13 +11,8 @@ if(WITH_PYTHON)
     find_package(PythonLibs 3 REQUIRED)
 endif()
 
-#IF(USE_SSE)
-#    SET(CMAKE_C_FLAGS_RELEASE "${CMAKE_C_FLAGS_RELEASE} -finline-functions -msse -msse2")
-#    SET(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -finline-functions -msse -msse2")
-#
-#    SET(CMAKE_C_FLAGS_RELWITHDEBINFO "${CMAKE_C_FLAGS_RELWITHDEBINFO} -finline-functions -msse -msse2")
-#    SET(CMAKE_CXX_FLAGS_RELWITHDEBINFO "${CMAKE_CXX_FLAGS_RELWITHDEBINFO} -msse -msse2")
-#ENDIF()
+SET(CMAKE_C_FLAGS_RELEASE "${CMAKE_C_FLAGS_RELEASE} -march=native")
+SET(CMAKE_C_FLAGS_RELWITHDEBINFO "${CMAKE_C_FLAGS_RELWITHDEBINFO} -march=native")
 
 add_subdirectory(src)
 add_subdirectory(test)

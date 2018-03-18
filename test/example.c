@@ -1,7 +1,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
-#include <time.h>
+#include <sys/time.h>
 
 #include "ed25519.h"
 
@@ -11,9 +11,9 @@ int main() {
     unsigned char shared_secret[32], other_shared_secret[32];
     unsigned char signature[64];
 
-    clock_t start;
-    clock_t end;
+    struct timeval start, end;
     int i;
+    double tdiff;
 
     const unsigned char message[] = "Hello, world!";
     const int message_len = strlen((char*) message);
@@ -76,70 +76,71 @@ int main() {
     }
 
     /* test performance */
+    
+    const int N = 20000;
+    
     printf("testing seed generation performance: ");
-    start = clock();
-    for (i = 0; i < 10000; ++i) {
+    gettimeofday(&start, NULL);
+    for (i = 0; i < N; ++i) {
         ed25519_create_seed(seed);
     }
-    end = clock();
-
-    printf("%fus per seed\n", ((double) ((end - start) * 1000)) / CLOCKS_PER_SEC / i * 1000);
-
+    gettimeofday(&end, NULL);
+    tdiff = end.tv_sec - start.tv_sec + (end.tv_usec - start.tv_usec) / 1000000.0;
+    printf("ed25519_create_seed: %.3f per second\n", N/tdiff);
 
     printf("testing key generation performance: ");
-    start = clock();
-    for (i = 0; i < 10000; ++i) {
+    gettimeofday(&start, NULL);
+    for (i = 0; i < N; ++i) {
         ed25519_create_keypair(public_key, private_key, seed);
     }
-    end = clock();
-
-    printf("%fus per keypair\n", ((double) ((end - start) * 1000)) / CLOCKS_PER_SEC / i * 1000);
-
+    gettimeofday(&end, NULL);
+    tdiff = end.tv_sec - start.tv_sec + (end.tv_usec - start.tv_usec) / 1000000.0;
+    printf("ed25519_create_keypair: %.3f per second\n", N/tdiff);
+    
     printf("testing sign performance: ");
-    start = clock();
-    for (i = 0; i < 10000; ++i) {
+    gettimeofday(&start, NULL);
+    for (i = 0; i < N; ++i) {
         ed25519_sign(signature, message, message_len, public_key, private_key);
     }
-    end = clock();
-
-    printf("%fus per signature\n", ((double) ((end - start) * 1000)) / CLOCKS_PER_SEC / i * 1000);
+    gettimeofday(&end, NULL);
+    tdiff = end.tv_sec - start.tv_sec + (end.tv_usec - start.tv_usec) / 1000000.0;
+    printf("ed25519_sign: %.3f per second\n", N/tdiff);
 
     printf("testing verify performance: ");
-    start = clock();
-    for (i = 0; i < 10000; ++i) {
+    gettimeofday(&start, NULL);
+    for (i = 0; i < N; ++i) {
         ed25519_verify(signature, message, message_len, public_key);
     }
-    end = clock();
-
-    printf("%fus per signature\n", ((double) ((end - start) * 1000)) / CLOCKS_PER_SEC / i * 1000);
+    gettimeofday(&end, NULL);
+    tdiff = end.tv_sec - start.tv_sec + (end.tv_usec - start.tv_usec) / 1000000.0;
+    printf("ed25519_verify: %.3f per second\n", N/tdiff);
     
-
     printf("testing keypair scalar addition performance: ");
-    start = clock();
-    for (i = 0; i < 10000; ++i) {
+    gettimeofday(&start, NULL);
+    for (i = 0; i < N; ++i) {
         ed25519_add_scalar(public_key, private_key, scalar);
     }
-    end = clock();
-
-    printf("%fus per keypair\n", ((double) ((end - start) * 1000)) / CLOCKS_PER_SEC / i * 1000);
+    gettimeofday(&end, NULL);
+    tdiff = end.tv_sec - start.tv_sec + (end.tv_usec - start.tv_usec) / 1000000.0;
+    printf("ed25519_add_scalar: %.3f per second\n", N/tdiff);
 
     printf("testing public key scalar addition performance: ");
-    start = clock();
-    for (i = 0; i < 10000; ++i) {
+    gettimeofday(&start, NULL);
+    for (i = 0; i < N; ++i) {
         ed25519_add_scalar(public_key, NULL, scalar);
     }
-    end = clock();
-
-    printf("%fus per key\n", ((double) ((end - start) * 1000)) / CLOCKS_PER_SEC / i * 1000);
+    gettimeofday(&end, NULL);
+    tdiff = end.tv_sec - start.tv_sec + (end.tv_usec - start.tv_usec) / 1000000.0;
+    printf("ed25519_add_scalar: %.3f per second\n", N/tdiff);
 
     printf("testing key exchange performance: ");
-    start = clock();
-    for (i = 0; i < 10000; ++i) {
+    gettimeofday(&start, NULL);
+    for (i = 0; i < N; ++i) {
         ed25519_key_exchange(shared_secret, other_public_key, private_key);
     }
-    end = clock();
-
-    printf("%fus per shared secret\n", ((double) ((end - start) * 1000)) / CLOCKS_PER_SEC / i * 1000);
-
+    gettimeofday(&end, NULL);
+    tdiff = end.tv_sec - start.tv_sec + (end.tv_usec - start.tv_usec) / 1000000.0;
+    printf("ed25519_key_exchange: %.3f per second\n", N/tdiff);
+    
     return 0;
 }

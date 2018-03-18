@@ -8,15 +8,18 @@ add_library(ed25519 ${LIB_SOURCES})
 
 if(WITH_PYTHON)
     # C library + Python interface
-    include_directories(${PYTHON_INCLUDE_DIRS})
     add_library(ed25519_python ${LIB_SOURCES} pyapi.c)
     set_target_properties(ed25519_python PROPERTIES POSITION_INDEPENDENT_CODE ON)
+    set_target_properties(ed25519_python PROPERTIES INCLUDE_DIRECTORIES ${PYTHON_INCLUDE_DIRS})
     set_target_properties(ed25519_python PROPERTIES COMPILE_DEFINITIONS WITH_PYTHON)
     target_link_libraries(ed25519_python ${PYTHON_LIBRARIES})
     
     # Python module, using the above library
     add_library(wrapper MODULE pyapi.c)
     target_link_libraries(wrapper ${PYTHON_LIBRARIES} ed25519_python)
+    set_target_properties(wrapper PROPERTIES POSITION_INDEPENDENT_CODE ON)
+    set_target_properties(wrapper PROPERTIES INCLUDE_DIRECTORIES ${PYTHON_INCLUDE_DIRS})
+    set_target_properties(wrapper PROPERTIES COMPILE_DEFINITIONS WITH_PYTHON)
     set_target_properties(wrapper PROPERTIES PREFIX "")
     set_target_properties(wrapper PROPERTIES OUTPUT_NAME "ed25519")
 endif()
