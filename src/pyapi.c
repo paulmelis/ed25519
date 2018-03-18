@@ -26,6 +26,33 @@ PyObject* py_hash = NULL;
 // API methods
 //
 
+#ifndef ED25519_NO_SEED
+
+static char create_seed_doc[] = 
+"create_seed() -> seed\n\
+\n\
+Creates a new random 32-byte seed, which can be passed to create_keypair()\n\
+";
+
+static PyObject*
+py_create_seed(PyObject* self, PyObject* args, PyObject *kwds)
+{
+    unsigned char   seed[32];
+    int             res;
+    
+    res = ed25519_create_seed(seed);
+    
+    if (res == 1)
+    {
+        PyErr_SetString(PyExc_ValueError, "Error in generating seed");
+        return NULL;
+    }
+    
+    return Py_BuildValue("y#", seed, 32);
+}
+
+#endif
+
 static char create_keypair_doc[] = 
 "create_keypair(seed) -> (public_key, private_key)\n\
 \n\
@@ -265,6 +292,9 @@ print_python_error(void)
 
 static PyMethodDef ModuleMethods[] =
 {    
+#ifndef ED25519_NO_SEED
+    {"create_seed",             (PyCFunction)py_create_seed,            METH_VARARGS|METH_KEYWORDS, create_seed_doc},
+#endif
     {"create_keypair",          (PyCFunction)py_create_keypair,         METH_VARARGS|METH_KEYWORDS, create_keypair_doc},
     {"get_pubkey",              (PyCFunction)py_get_pubkey,             METH_VARARGS|METH_KEYWORDS, get_pubkey_doc},
     {"privkey_from_ref10",      (PyCFunction)py_privkey_from_ref10,     METH_VARARGS|METH_KEYWORDS, privkey_from_ref10_doc},
@@ -273,7 +303,6 @@ static PyMethodDef ModuleMethods[] =
     {"custom_hash_function",    (PyCFunction)py_custom_hash_function,   METH_VARARGS|METH_KEYWORDS, custom_hash_function_doc},
     //add_scalar
     //key_exchange
-    //create_seed
      {NULL, NULL, 0, NULL}
 };
 

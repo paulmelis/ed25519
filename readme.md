@@ -35,12 +35,12 @@ The `ed25519` Python module also has an additional option to use a custom
 hash function in place of the default SHA-512. See `ed25519.custom_hash_function()`.
 
 There's also two extra utility routines `ed25519_privkey_from_ref10` and `ed25519_get_pubkey`,
-including Python wrappers. See the description of the C API below.
+also available from Python. See the description of the C API below.
 
 Limitations:
 
-- Currently, C routines `ed25519_add_scalar`, `ed25519_key_exchange` and `ed25519_create_seed` are
-not available from Python, but this would not be much work to add.
+- Currently, C routines `ed25519_add_scalar` and `ed25519_key_exchange` are
+  not available from Python, but this would not be much work to add.
 - The Python module is only compatible with Python 3.x
 
 
