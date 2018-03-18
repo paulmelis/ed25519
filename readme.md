@@ -78,10 +78,12 @@ architectures, if possible compile as 64 bit.
 Usage
 -----
 
-Simply add all .c and .h files in the `src/` folder to your project and include
-`ed25519.h` in any file you want to use the API. If you prefer to use a shared
-library, only copy `ed25519.h` and define `ED25519_DLL` before importing. A
-windows DLL is pre-built.
+CMake files are provided to build a static library, `ed25519.a`. The `WITH_PYTHON`
+option (set to ON by default) enables building of the Python module.
+
+An alternative is to simply add all .c and .h files in the `src/` folder (except
+`pyapi.c` and `pyapi.h`) to your project and include `ed25519.h` in any file you 
+want to use the API. 
 
 There are no defined types for seeds, private keys, public keys, shared secrets
 or signatures. Instead simple `unsigned char` buffers are used with the
@@ -248,31 +250,30 @@ The additional code by Paul Melis is covered by the same license.
 Compatibility with other Ed25519 implementations
 ------------------------------------------------
 
-From https://github.com/orlp/ed25519/issues/1
+(Based on [these](https://github.com/orlp/ed25519/issues/1) 
+[issues](https://github.com/orlp/ed25519/issues/10))
 
-> There are different ways to store a Ed25519 private key. The seed gets hashed to get the private key, and then the private key gets multiplied by the Ed25519 curve basepoint to get the public key. You can store the seed and hash it everytime you need the private key, or just store the result of the hash. My library does the latter, as this saves a bit of performance on every operation. This means that it's impossible to get the seed back from the private or public key.
-> 
-> Also interesting is that Ed25519 also requires the public key while signing. Some libraries hide this by concatenating the public key and the private key/seed and calling that result the private key. I don't, and require you to pass both the public key and private key to the sign operation.
-> 
-> It's impossible to get the seed from the private key. To turn a private key (which is the hashed seed) into a public key, look into `ed25519_create_keypair` and remove the hashing code.
+There are different ways to store a Ed25519 private key. The seed 
+gets hashed to get the private key and then the private key gets 
+multiplied by the Ed25519 curve basepoint to get the public key. 
+One can store the seed and hash it everytime you need the private 
+key, or just store the result of the hash. 
 
-From https://github.com/orlp/ed25519/issues/10
+This library does the latter (storing the hashed seed), as this saves 
+a bit of performance on every operation. This means that it's 
+impossible to get the seed back from the private or public key.
 
-> `ed25519_sign` is not significantly different from SUPERCOP's ref10, I simply have a different representation of the private key.
->
-> ref10 stores the private key by storing the seed (32 bytes) and public key (32 bytes) as the 'private key'.
->
-> I instead straight up store the hashed seed (64 bytes) as the private key to not have to re-hash the seed on every sign operation.
->
-> So if you simply use the 64 bytes from the ref10 'private key' as the private key in this library you will end up with incorrect results.
->
-> If you wish to convert a ref10 private key to a private key for this library you can use:
+Also interesting is that Ed25519 requires the public key while 
+signing. Some libraries hide this by concatenating the public key and 
+the private key/seed and calling that result the "private key". Here
+we don't take that approach and require you to pass both the public key 
+and private key to the sign operation.
+ 
+Specifically, for [SUPERCOP's ref10](https://bench.cr.yp.to/supercop.html),
+it uses the above representation of the private key. The ref10 implementation
+stores the private key by storing the seed (32 bytes) and public key (32 bytes) 
+as the 'private key'. So if you simply use the 64 bytes from the ref10 'private key' 
+as the private key in this library you will end up with incorrect results.
+If you wish to convert a ref10 private key to a private key for this library you can 
+use `ed25519_privkey_from_ref10`.
 
-```
-void ref10_to_lib(unsigned char *private_key, const unsigned char *ref10_private_key) {
-    sha512(ref10_private_key, 32, private_key);
-    private_key[0] &= 248;
-    private_key[31] &= 63;
-    private_key[31] |= 64;
-}
-```
