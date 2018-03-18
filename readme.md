@@ -39,7 +39,7 @@ including Python wrappers. See the description of the C API below.
 
 Limitations:
 
-- Currently, C routines `ed25519_add_scalar` and `ed25519_key_exchange` are
+- Currently, C routines `ed25519_add_scalar`, `ed25519_key_exchange` and `ed25519_create_seed` are
 not available from Python, but this would not be much work to add.
 - The Python module is only compatible with Python 3.x
 
