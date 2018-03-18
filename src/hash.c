@@ -1,12 +1,15 @@
+#ifdef WITH_PYTHON
 #include <Python.h>
+#include "pyapi.h"
+#endif
 #include <stdlib.h>
 #include "hash.h"
 #include "sha512.h"
-#include "pyapi.h"
 
 void*
 hash_create_context(void)
 {
+#ifdef WITH_PYTHON
     if (use_python_hash)
     {
         PyObject *res = PyObject_CallObject(py_hash_create_context, NULL);
@@ -20,23 +23,26 @@ hash_create_context(void)
         
         return res;
     }
-    
+#endif
     return malloc(sizeof(sha512_context));
 }
 
 void 
 hash_free_context(void *context)
 {
+#ifdef WITH_PYTHON
     // XXX check for pyobject?
     if (use_python_hash)
         Py_DECREF((PyObject*)context);
     else
+#endif
         free(context);
 }
 
 int 
 hash_init(void *context)
 {
+#ifdef WITH_PYTHON
     if (use_python_hash)
     {
         PyObject *args = Py_BuildValue("(O)", (PyObject*)context);
@@ -56,12 +62,14 @@ hash_init(void *context)
         return 0;
     }
     else
+#endif
         return sha512_init(context);
 }
 
 int 
 hash_update(void *context, const unsigned char *in, size_t inlen)
 {
+#ifdef WITH_PYTHON
     if (use_python_hash)
     {
         PyObject *args = Py_BuildValue("(Oy#)", (PyObject*)context, in, inlen);
@@ -81,12 +89,14 @@ hash_update(void *context, const unsigned char *in, size_t inlen)
         return 0;
     }
     else
+#endif
         return sha512_update(context, in, inlen);
 }
 
 int 
 hash_final(void *context, unsigned char *out)
 {
+#ifdef WITH_PYTHON
     if (use_python_hash)
     {        
         PyObject *args = Py_BuildValue("(O)", (PyObject*)context);
@@ -112,12 +122,14 @@ hash_final(void *context, unsigned char *out)
         return 0;
     }
     else
+#endif
         return sha512_final(context, out);
 }
 
 int 
 hash(const unsigned char *message, size_t message_len, unsigned char *out)
 {
+#ifdef WITH_PYTHON
     if (use_python_hash)
     {
         PyObject *args = Py_BuildValue("(y#)", message, message_len);
@@ -148,5 +160,6 @@ hash(const unsigned char *message, size_t message_len, unsigned char *out)
         return 0;
     }
     else
+#endif
         return sha512(message, message_len, out);
 }
