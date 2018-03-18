@@ -173,7 +173,7 @@ shared secret. It is recommended to hash the shared secret before using it.
 be stored.
 
 ```c
-void ED25519_DECLSPEC ed25519_privkey_from_ref10(unsigned char *private_key, const unsigned char *ref10_private_key);
+void ed25519_privkey_from_ref10(unsigned char *private_key, const unsigned char *ref10_private_key);
 ```
 
 Convert a private key stored as the seed (32 bytes) plus public key (32 bytes), such as
