@@ -39,8 +39,8 @@ also available from Python. See the description of the C API below.
 
 Limitations:
 
-- Currently, C routines `ed25519_add_scalar` and `ed25519_key_exchange` are
-  not available from Python, but this would not be much work to add.
+- Currently, C routine `ed25519_add_scalar` is not available from Python, but this 
+  would not be much work to add.
 - The Python module is only compatible with Python 3.x
 
 

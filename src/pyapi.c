@@ -220,6 +220,48 @@ py_verify(PyObject* self, PyObject* args, PyObject *kwds)
     return PyBool_FromLong(res);
 }
 
+
+static char key_exchange_doc[] = 
+"key_exchange(public_key, private_key) -> shared_secret\n\
+\n\
+Performs a key exchange on the given public key and (unrelated) private key,\n\
+producing a shared secret. It is recommended to hash the shared secret before using it.\n\
+Given two key pairs (pub1, priv1) and (pub2, priv2) the following property will hold:\n\
+\n\
+    key_exchange(pub1, priv2) == key_exchange(pub2, priv1)\n\
+\n\
+";
+
+static PyObject*
+py_key_exchange(PyObject* self, PyObject* args, PyObject *kwds)
+{
+    // void ed25519_key_exchange(unsigned char *shared_secret, const unsigned char *public_key, const unsigned char *private_key)
+    
+    unsigned char   shared_secret[32];
+    unsigned char   *pubkey, *privkey;
+    int             pubkey_len, privkey_len;
+    
+    if (!PyArg_ParseTuple(args, "y#y#", &pubkey, &pubkey_len, &privkey, &privkey_len))
+        return NULL;
+    
+    if (pubkey_len != 32)
+    {
+        PyErr_SetString(PyExc_ValueError, "Public key must be 32 bytes long");
+        return NULL;
+    }
+
+    if (privkey_len != 64)
+    {
+        PyErr_SetString(PyExc_ValueError, "Private key must be 64 bytes long");
+        return NULL;
+    }
+    
+    ed25519_key_exchange(shared_secret, pubkey, privkey);
+    
+    return Py_BuildValue("y#", shared_secret, 32);
+}
+
+
 static char custom_hash_function_doc[] = 
 "custom_hash_function(create_context, init, update, final, hash)\n\
 \n\
@@ -300,9 +342,9 @@ static PyMethodDef ModuleMethods[] =
     {"privkey_from_ref10",      (PyCFunction)py_privkey_from_ref10,     METH_VARARGS|METH_KEYWORDS, privkey_from_ref10_doc},
     {"sign",                    (PyCFunction)py_sign,                   METH_VARARGS|METH_KEYWORDS, sign_doc},
     {"verify",                  (PyCFunction)py_verify,                 METH_VARARGS|METH_KEYWORDS, verify_doc},
+    {"key_exchange",            (PyCFunction)py_key_exchange,           METH_VARARGS|METH_KEYWORDS, key_exchange_doc},
     {"custom_hash_function",    (PyCFunction)py_custom_hash_function,   METH_VARARGS|METH_KEYWORDS, custom_hash_function_doc},
     //add_scalar
-    //key_exchange
      {NULL, NULL, 0, NULL}
 };
 
