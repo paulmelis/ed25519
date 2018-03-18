@@ -4,7 +4,9 @@ Ed25519
 Note: this is a fork of the Ed25519 implementation available at 
 https://github.com/orlp/ed25519. 
 
-That original implementation is by Orson Peters (orsonpeters@gmail.com)
+That original implementation is by Orson Peters (orsonpeters@gmail.com).
+Many thanks to him for creating such a comprehensive library and 
+making it available as open source.
 
 This fork, by Paul Melis (paul.melis@gmail.com), has additional features,
 see below.
@@ -169,6 +171,14 @@ Performs a key exchange on the given public key and private key, producing a
 shared secret. It is recommended to hash the shared secret before using it.
 `shared_secret` must be a 32 byte writable buffer where the shared secret will
 be stored.
+
+```c
+void ED25519_DECLSPEC ed25519_privkey_from_ref10(unsigned char *private_key, const unsigned char *ref10_private_key);
+```
+
+Convert a private key stored as the seed (32 bytes) plus public key (32 bytes), such as
+used by SUPERCOP's ref10 implementation, into a private key usable by this library.
+
 
 Examples
 -------
