@@ -39,6 +39,10 @@ hash function in place of the default SHA-512. See `ed25519.custom_hash_function
 There's also two extra utility routines `ed25519_privkey_from_ref10` and `ed25519_get_pubkey`,
 also available from Python. See the description of the C API below.
 
+The Python routines can be called in a multi-threading setting, as the GIL
+is released around the calls to the underlying C API calls. This even holds
+for the case of a custom hash function defined in Python.
+
 Limitations:
 
 - Currently, C routine `ed25519_add_scalar` is not available from Python, but this 
