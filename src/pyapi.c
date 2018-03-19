@@ -40,7 +40,11 @@ py_create_seed(PyObject* self, PyObject* args, PyObject *kwds)
     unsigned char   seed[32];
     int             res;
     
+    Py_BEGIN_ALLOW_THREADS
+    
     res = ed25519_create_seed(seed);
+    
+    Py_END_ALLOW_THREADS
     
     if (res == 1)
     {
@@ -78,7 +82,11 @@ py_create_keypair(PyObject* self, PyObject* args, PyObject *kwds)
         return NULL;
     }
     
+    Py_BEGIN_ALLOW_THREADS
+    
     ed25519_create_keypair(pubkey, privkey, (const unsigned char*)seed);
+    
+    Py_END_ALLOW_THREADS
     
     return Py_BuildValue("y#y#", pubkey, 32, privkey, 64);
 }
@@ -109,7 +117,11 @@ py_get_pubkey(PyObject* self, PyObject* args, PyObject *kwds)
         return NULL;
     }
     
+    Py_BEGIN_ALLOW_THREADS
+    
     ed25519_get_pubkey((unsigned char *)pubkey, (const unsigned char *)privkey);
+    
+    Py_END_ALLOW_THREADS
     
     return Py_BuildValue("y#", pubkey, 32);
 }
@@ -143,7 +155,11 @@ py_privkey_from_ref10(PyObject* self, PyObject* args, PyObject *kwds)
         return NULL;
     }
     
+    Py_BEGIN_ALLOW_THREADS
+    
     ed25519_privkey_from_ref10((unsigned char *)privkey, (const unsigned char *)ref10_privkey);
+    
+    Py_END_ALLOW_THREADS
     
     return Py_BuildValue("y#", privkey, 64);
 }
@@ -178,7 +194,11 @@ py_sign(PyObject* self, PyObject* args, PyObject *kwds)
         return NULL;
     }
     
+    Py_BEGIN_ALLOW_THREADS
+    
     ed25519_sign(signature, (const unsigned char *)message, message_len, (const unsigned char *)pubkey, (const unsigned char *)privkey);
+    
+    Py_END_ALLOW_THREADS
     
     return Py_BuildValue("y#", signature, 64);
 }
@@ -215,7 +235,11 @@ py_verify(PyObject* self, PyObject* args, PyObject *kwds)
         return NULL;
     }
     
+    Py_BEGIN_ALLOW_THREADS
+    
     res = ed25519_verify((const unsigned char *)signature, (const unsigned char *)message, message_len, (const unsigned char *)pubkey);
+    
+    Py_END_ALLOW_THREADS
     
     return PyBool_FromLong(res);
 }
@@ -256,7 +280,11 @@ py_key_exchange(PyObject* self, PyObject* args, PyObject *kwds)
         return NULL;
     }
     
+    Py_BEGIN_ALLOW_THREADS
+    
     ed25519_key_exchange(shared_secret, pubkey, privkey);
+    
+    Py_END_ALLOW_THREADS
     
     return Py_BuildValue("y#", shared_secret, 32);
 }
