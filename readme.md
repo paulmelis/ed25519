@@ -41,7 +41,16 @@ also available from Python. See the description of the C API below.
 
 The Python routines can be called in a multi-threading setting, as the GIL
 is released around the calls to the underlying C API calls. This even holds
-for the case of a custom hash function defined in Python.
+for the case of a custom hash function defined in Python. This gives quite a 
+nice speedup on a synthetic benchmark of checking the signature of a 64-byte
+message (at least for up to 4 threads):
+
+| Threads | Performance | Speedup |
+| ------- | ----------- | ------- |
+| 1 | 100000 jobs in 9.419 seconds | 1.00x |
+| 2 | 100000 jobs in 4.978 seconds | 1.89x |
+| 4 | 100000 jobs in 2.501 seconds | 3.77x |
+| 8 | 100000 jobs in 2.356 seconds | 4.00x |
 
 Limitations:
 
