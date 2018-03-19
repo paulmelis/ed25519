@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-import queue, threading, time
+import hashlib, queue, threading, time
 import ed25519
 
 class JobThread(threading.Thread):
@@ -18,6 +18,26 @@ class JobThread(threading.Thread):
             message, signature, pubkey = item
             ok = ed25519.verify(signature, message, pubkey)
             assert ok
+
+def create_context():
+    return hashlib.sha512()
+
+def init(context):
+    pass
+
+def update(context, arg):
+    context.update(arg)
+
+def final(context):
+    return context.digest()
+
+def hash(message):
+    h = hashlib.sha512()
+    h.update(message)
+    return h.digest()
+
+if True:
+    ed25519.custom_hash_function(create_context, init, update, final, hash)
 
 message = b'1234567890123456789012345678901234567890123456789012345678901234'
 
@@ -40,8 +60,6 @@ for T in [1, 2, 4, 8]:
     for i in range(T):
         jobs.put(None)
         
-    print('Starting %d threads' % T)
-        
     t0 = time.time()
 
     threads = []
@@ -56,9 +74,9 @@ for T in [1, 2, 4, 8]:
     t1 = time.time()
     tdiff = t1 - t0
     if T == 1:
-        t_base = tdiff    
-        print('%d jobs in %.3f seconds' % (N, tdiff))
+        t_base = tdiff
+        print('[t=%d] %d jobs in %.3f seconds' % (T, N, tdiff))
     else:
-        print('%d jobs in %.3f seconds (%.2fx)' % (N, tdiff, t_base/tdiff))
+        print('[t=%d] %d jobs in %.3f seconds (%.2fx)' % (T, N, tdiff, t_base/tdiff))
         
     
