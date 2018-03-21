@@ -129,8 +129,8 @@ void ed25519_create_keypair(unsigned char *public_key, unsigned char *private_ke
 ed25519.create_keypair(seed) # -> public_key, private_key
 ```
 
-Creates a new key pair from the given seed. `public_key` must be a writable 32
-byte buffer, `private_key` must be a writable 64 byte buffer and `seed` must be
+Creates a new key pair from the given seed. C only: `public_key` must be a writable 32
+byte buffer, `private_key` must be a writable 64 byte buffer. `seed` must be
 a 32 byte buffer.
 
 ```c
@@ -142,7 +142,7 @@ ed25519.get_pubkey(private_key) # -> public_key
 ```
 
 
-Derives public key from the given private key. `public_key` must be
+Derives public key from the given private key. C only: `public_key` must be
 a writable 32 byte buffer, `private_key` must be a 64 byte buffer with
 a valid private key.
 
