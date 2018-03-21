@@ -114,7 +114,7 @@ int ed25519_create_seed(unsigned char *seed);
 ```
 
 ```python
-ed25519.create_seed() -> seed
+ed25519.create_seed() # -> seed
 ```
 
 Creates a 32 byte random seed in `seed` for key generation. C only: `seed` must be a
@@ -126,7 +126,7 @@ void ed25519_create_keypair(unsigned char *public_key, unsigned char *private_ke
 ```
 
 ```python
-ed25519.create_keypair(seed) -> public_key, private_key
+ed25519.create_keypair(seed) # -> public_key, private_key
 ```
 
 Creates a new key pair from the given seed. `public_key` must be a writable 32
@@ -138,7 +138,7 @@ void ed25519_get_pubkey(unsigned char *public_key, const unsigned char *private_
 ```
 
 ```python
-ed25519.get_pubkey(private_key) -> public_key
+ed25519.get_pubkey(private_key) # -> public_key
 ```
 
 
@@ -154,7 +154,7 @@ void ed25519_sign(unsigned char *signature,
 ```
 
 ```python
-ed25519.sign(message, public_key, private_key) -> signature
+ed25519.sign(message, public_key, private_key) # -> signature
 ```
 
 Creates a signature of the given message with the given key pair. C only: `signature`
@@ -168,7 +168,7 @@ int ed25519_verify(const unsigned char *signature,
 ```
 
 ```python
-ed25519.verify(signature, message, public_key) -> bool
+ed25519.verify(signature, message, public_key) # -> bool
 ```
 
 Verifies the signature on the given message using `public_key`. `signature`
@@ -198,7 +198,7 @@ void ed25519_key_exchange(unsigned char *shared_secret,
 ```
 
 ```python
-ed25519.key_exchange(public_key, private_key) -> shared_secret
+ed25519.key_exchange(public_key, private_key) # -> shared_secret
 ```
 
 Performs a key exchange on the given public key and private key, producing a
@@ -211,7 +211,7 @@ void ed25519_privkey_from_ref10(unsigned char *private_key, const unsigned char 
 ```
 
 ```python
-ed25519.privkey_from_ref10(ref10_private) -> private_key
+ed25519.privkey_from_ref10(ref10_private) # -> private_key
 ```
 
 Convert a private key stored as the seed (32 bytes) plus public key (32 bytes), such as
