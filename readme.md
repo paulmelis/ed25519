@@ -8,18 +8,14 @@ That original implementation is by Orson Peters (orsonpeters@gmail.com).
 Many thanks to him for creating such a comprehensive library and 
 making it available as open source.
 
-This fork, by Paul Melis (paul.melis@gmail.com), has additional features.
-Compared to the original code at https://github.com/orlp/ed25519 this
-Ed25519 implementation contains a Python 3 module (`ed25519`) that wraps the
-C routines for creating key pairs, signing and verifying messages. 
+This fork, by Paul Melis (paul.melis@gmail.com), has additional features:
 
-The `ed25519` Python module also has an additional option to use a custom 
-hash function in place of the default SHA-512. See `ed25519.custom_hash_function()`.
-
-There's also two extra utility routines `ed25519_privkey_from_ref10` and `ed25519_get_pubkey`,
-also available from Python. See the description of the C API below.
-
-The Python routines can be called in a multi-threading setting, as the GIL
+* A Python 3 module, `ed25519`, that wraps the C routines for creating key pairs, signing and verifying messages
+* The `ed25519` Python module also has an additional option to use a custom 
+  hash function in place of the default SHA-512. See `ed25519.custom_hash_function()`.
+* There's also two extra utility routines `ed25519_privkey_from_ref10` and `ed25519_get_pubkey`,
+  also available from Python. See the description of the C API below.
+* The Python routines can be called in a multi-threading setting, as the GIL
 is released around the calls to the underlying C API calls. This even holds
 for the case of a custom hash function defined in Python. This gives quite a 
 nice speedup on a synthetic benchmark of checking the signature of a 64-byte
