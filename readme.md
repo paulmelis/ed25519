@@ -8,27 +8,7 @@ That original implementation is by Orson Peters (orsonpeters@gmail.com).
 Many thanks to him for creating such a comprehensive library and 
 making it available as open source.
 
-This fork, by Paul Melis (paul.melis@gmail.com), has additional features,
-see below.
-
-Original description
---------------------
-
-This is a portable implementation of [Ed25519](http://ed25519.cr.yp.to/) based
-on the SUPERCOP "ref10" implementation. Additionally there is key exchanging
-and scalar addition included to further aid building a PKI using Ed25519. All
-code is licensed under the permissive zlib license.
-
-All code is pure ANSI C without any dependencies, except for the random seed
-generation which uses standard OS cryptography APIs (`CryptGenRandom` on
-Windows, `/dev/urandom` on nix). If you wish to be entirely portable define
-`ED25519_NO_SEED`. This disables the `ed25519_create_seed` function, so if your
-application requires key generation you must supply your own seeding function
-(which is simply a 256 bit (32 byte) cryptographic random number generator).
-
-Additional features
--------------------
-
+This fork, by Paul Melis (paul.melis@gmail.com), has additional features.
 Compared to the original code at https://github.com/orlp/ed25519 this
 Ed25519 implementation contains a Python 3 module (`ed25519`) that wraps the
 C routines for creating key pairs, signing and verifying messages. 
@@ -58,6 +38,20 @@ Limitations:
   would not be much work to add.
 - The Python module is only compatible with Python 3.x
 
+Original description
+--------------------
+
+This is a portable implementation of [Ed25519](http://ed25519.cr.yp.to/) based
+on the SUPERCOP "ref10" implementation. Additionally there is key exchanging
+and scalar addition included to further aid building a PKI using Ed25519. All
+code is licensed under the permissive zlib license.
+
+All code is pure ANSI C without any dependencies, except for the random seed
+generation which uses standard OS cryptography APIs (`CryptGenRandom` on
+Windows, `/dev/urandom` on nix). If you wish to be entirely portable define
+`ED25519_NO_SEED`. This disables the `ed25519_create_seed` function, so if your
+application requires key generation you must supply your own seeding function
+(which is simply a 256 bit (32 byte) cryptographic random number generator).
 
 Performance
 -----------
