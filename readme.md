@@ -90,8 +90,7 @@ An alternative is to simply add all .c and .h files in the `src/` folder (except
 `pyapi.c` and `pyapi.h`) to your project and include `ed25519.h` in any file you
 want to use the API.
 
-There are no defined types for seeds, private keys, public keys, shared secrets
-or signatures. Instead simple `unsigned char` buffers are used with the
+For the C API there are no defined types for seeds, private keys, public keys, shared secrets or signatures. Instead simple `unsigned char` buffers are used with the
 following sizes:
 
 ```c
@@ -102,6 +101,8 @@ unsigned char private_key[64];
 unsigned char scalar[32];
 unsigned char shared_secret[32];
 ```
+
+In the Python API `bytes` objects are used for these values, with the same lengths.
 
 API
 ---
